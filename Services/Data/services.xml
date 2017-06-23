@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfService xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Service>
+    <Name>французский</Name>
+    <ServiceType>Education</ServiceType>
+    <PhoneNumber>098-765-43-21</PhoneNumber>
+    <Responsible>John Smith</Responsible>
+  </Service>
+  <Service>
+    <Name>Computer Service</Name>
+    <ServiceType>Service</ServiceType>
+    <PhoneNumber>098-765-43-22</PhoneNumber>
+    <Responsible>Nicolas Tesla</Responsible>
+  </Service>
+  <Service>
+    <Name>Heat pump selling</Name>
+    <ServiceType>Commerce</ServiceType>
+    <PhoneNumber>098-765-43-23</PhoneNumber>
+    <Responsible>Elon Bush</Responsible>
+  </Service>
+  <Service>
+    <Name>Furniture producing</Name>
+    <ServiceType>Other</ServiceType>
+    <PhoneNumber>098-765-43-24</PhoneNumber>
+    <Responsible>Ray Musk</Responsible>
+  </Service>
+</ArrayOfService>
