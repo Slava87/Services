@@ -69,6 +69,7 @@ namespace Services.IOServices
                 string input = ReadData();
                 parseResult = Int32.TryParse(input, out index);
                 if (index < 0 || index >= i || !parseResult)
+
                     OutputService.Display("Error, please enter correct number");
             }
 
