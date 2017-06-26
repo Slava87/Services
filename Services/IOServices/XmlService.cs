@@ -49,7 +49,7 @@ namespace Services.IOServices
             catch (Exception ex)
             {
                 OutputService.Display("Error: " + ex.InnerException);
-                InputService.ReadData();
+                InputService.ReadDataFromConsole();
             }
             return services;
         }

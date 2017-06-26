@@ -40,7 +40,7 @@ namespace Services.IOServices
             OutputService.Display(@"Please enter file location (example c:\myFile.txt):");
             while (true)
             {
-                string path = ReadData();
+                string path = ReadDataFromConsole();
                 if (File.Exists(path))
                 {
                     Global.InputPath = path;
@@ -81,7 +81,7 @@ namespace Services.IOServices
             bool parseResult = false;
             while (index < 0 || index > i - 1 || !parseResult)
             {
-                string input = ReadData();
+                string input = ReadDataFromConsole();
                 parseResult = Int32.TryParse(input, out index);
                 if (index < 0 || index >= i || !parseResult)
 
@@ -91,7 +91,7 @@ namespace Services.IOServices
             return index;
         }
 
-        public static string ReadData()
+        public static string ReadDataFromConsole()
         {
             return Console.ReadLine();
         }
@@ -110,7 +110,7 @@ namespace Services.IOServices
                 OutputService.Display("Please enter command:");
                 GetCommand();
                 Actions[(int)Global.Command]();
-                ReadData();
+                ReadDataFromConsole();
             }
         }
 
@@ -150,7 +150,7 @@ namespace Services.IOServices
                 OutputService.Display(@"Please enter file location (example c:\myFile.txt):");
                 while (true)
                 {
-                    string path = ReadData();
+                    string path = ReadDataFromConsole();
                     Global.OutputPath = path;
                     break;
                 }

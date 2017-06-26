@@ -8,7 +8,7 @@ namespace Services.DataHandler
     {
         public static string ValidateLength(int length)
         {
-            string str = InputService.ReadData();
+            string str = InputService.ReadDataFromConsole();
             while (true)
             {
                 if (str.Length <= length && str.Length != 0)
@@ -17,20 +17,20 @@ namespace Services.DataHandler
                 {
                     OutputService.Display("Line can not be empty");
                     OutputService.Display("Please try again");
-                    str = InputService.ReadData();
+                    str = InputService.ReadDataFromConsole();
                 }
                 else
                 {
                     OutputService.Display($"Line is too long. Max is {length} symbols");
                     OutputService.Display("Please try again");
-                    str = InputService.ReadData();
+                    str = InputService.ReadDataFromConsole();
                 }
             }
         }
 
         public static string ValidatePhone()
         {
-            string str = InputService.ReadData();
+            string str = InputService.ReadDataFromConsole();
             Regex expression = new Regex(@"^([+]\d{1,2}-? *)?\(?\d{3}\)?-? *\d{3}-? *-?\d{2} *-?\d{2}$");
             while (true)
             {
@@ -40,7 +40,7 @@ namespace Services.DataHandler
                 {
                     OutputService.Display("PhoneNumber is not correct");
                     OutputService.Display("Please try again");
-                    str = InputService.ReadData();
+                    str = InputService.ReadDataFromConsole();
                 }
             }
         }
