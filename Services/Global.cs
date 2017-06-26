@@ -20,14 +20,15 @@ namespace Services.DataHandler
 
     public enum DataType
     {
+        XML,
         JSON,
-        XML
     }
 
     public enum DataSource
     {
         DefaultLocation,
-        ChooseManually
+        ChooseManually,
+        Database
     }
 
     public enum ServiceType
@@ -44,7 +45,8 @@ namespace Services.DataHandler
         public static string InputPath = @"..\..\Data\services.xml";
         public static string OutputPath = @"..\..\Data\services.xml";
 
-        public static DataSource DataSource = DataSource.DefaultLocation;
+        public static DataSource InputDataSource = DataSource.DefaultLocation;
+        public static DataSource OutputDataSource = DataSource.DefaultLocation;
         public static DataType InputDataType = DataType.XML;
         public static DataType OutputDataType = DataType.XML;
         public static SortType SortType = SortType.Name;

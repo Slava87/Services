@@ -5,34 +5,49 @@ using Services.Entity;
 using Services.DataHandler;
 
 namespace Services.IOServices
-{ 
+{
     public class InputService
     {
         public Action[] Actions = { Show, Sort, AddService, Export, Exit };
 
         public void GetDataSource()
         {
-            Global.DataSource = (DataSource)GetValidatedUserChoice(new DataSource());
+            Global.InputDataSource = (DataSource)GetValidatedUserChoice(new DataSource());
 
-            switch (Global.DataSource)
+            ServiceHandler serviceHdlr;
+            switch (Global.InputDataSource)
             {
                 case DataSource.DefaultLocation:
                     Global.InputPath = @"..\..\Data\services.xml";
+                    serviceHdlr = new ServiceHandler();
+                    Global.Services.AddRange(serviceHdlr.DownloadServices());
                     break;
                 case DataSource.ChooseManually:
-                    OutputService.Display(@"Please enter file location (example c:\myFile.txt):");
-                    while (true)
-                    {
-                        string path = ReadData();
-                        if (File.Exists(path))
-                        {
-                            Global.InputPath = path;
-                            break;
-                        }
-                        else
-                            OutputService.Display(@"Your path is not correct");
-                    }
+                    GetInputPath();
+                    serviceHdlr = new ServiceHandler();
+                    Global.Services.AddRange(serviceHdlr.DownloadServices());
                     break;
+                case DataSource.Database:
+                    DBService dbService = new DBService();
+                    Global.Services.AddRange(dbService.GetAllServices());
+                    dbService.Dispose();
+                    break;
+            }
+        }
+
+        private void GetInputPath()
+        {
+            OutputService.Display(@"Please enter file location (example c:\myFile.txt):");
+            while (true)
+            {
+                string path = ReadData();
+                if (File.Exists(path))
+                {
+                    Global.InputPath = path;
+                    break;
+                }
+                else
+                    OutputService.Display(@"Your path is not correct");
             }
         }
 
@@ -84,9 +99,9 @@ namespace Services.IOServices
         public void Run()
         {
             GetDataSource();
-            GetDataType();
-            ServiceHandler serviceHdlr = new ServiceHandler();
-            serviceHdlr.DownloadServices();
+
+            if (Global.InputDataSource != DataSource.Database)
+                GetDataType();
 
             while (true)
             {
@@ -122,27 +137,42 @@ namespace Services.IOServices
 
         private static void Export()
         {
-            Global.OutputDataType = (DataType)GetValidatedUserChoice(new DataType());
+            Global.OutputDataSource = (DataSource)GetValidatedUserChoice(new DataSource());
 
-            OutputService.Display(@"Please enter file location (example c:\myFile.txt):");
-            while (true)
+            if (Global.OutputDataSource != DataSource.Database)
+                Global.OutputDataType = (DataType)GetValidatedUserChoice(new DataType());
+
+
+            if (Global.OutputDataSource == DataSource.ChooseManually ||
+                Global.OutputDataSource == DataSource.DefaultLocation)
             {
-                string path = ReadData();  
-                Global.OutputPath = path;
-                break;
 
+                OutputService.Display(@"Please enter file location (example c:\myFile.txt):");
+                while (true)
+                {
+                    string path = ReadData();
+                    Global.OutputPath = path;
+                    break;
+                }
+
+
+                switch (Global.OutputDataType)
+                {
+                    case DataType.JSON:
+                        JsonService jsonWriteService = new JsonService();
+                        jsonWriteService.WriteServiceToJsonFile(Global.Services);
+                        break;
+                    case DataType.XML:
+                        XmlService xmlWriteService = new XmlService();
+                        xmlWriteService.WriteServicesToXmlFile(Global.Services);
+                        break;
+                }
             }
-
-            switch (Global.OutputDataType)
+            if (Global.OutputDataSource == DataSource.Database)
             {
-                case DataType.JSON:
-                    JsonService jsonWriteService = new JsonService();
-                    jsonWriteService.WriteServiceToJsonFile(Global.Services);
-                    break;
-                case DataType.XML:
-                    XmlService xmlWriteService = new XmlService();
-                    xmlWriteService.WriteServicesToXmlFile(Global.Services);
-                    break;
+                DBService dbService = new DBService();
+                dbService.Save(Global.Services);
+                dbService.Dispose();
             }
         }
 

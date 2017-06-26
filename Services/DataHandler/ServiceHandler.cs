@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Services.IOServices; 
+using Services.IOServices;
 using Services.Entity;
 
 namespace Services.DataHandler
@@ -36,23 +36,25 @@ namespace Services.DataHandler
             return list;
         }
 
-        public void DownloadServices()
+        List<Service> _services = new List<Service>();
+        public List<Service> DownloadServices()
         {
             switch (Global.InputDataType)
             {
                 case DataType.JSON:
                     JsonService jsonReadService = new JsonService();
-                    Global.Services.AddRange(jsonReadService.ReadJsonFromFile());
+                    _services = jsonReadService.ReadJsonFromFile();
                     break;
                 case DataType.XML:
                     XmlService xmlReadService = new XmlService();
-                    Global.Services.AddRange(xmlReadService.ReadXmlFromFile());
+                    _services = xmlReadService.ReadXmlFromFile();
                     break;
             }
+            return _services;
         }
 
         public Service CreateService()
-        {     
+        {
             Service newCustomService = new Service();
             OutputService.Display("Enter Service Name: ");
             newCustomService.Name = StringValidation.ValidateLength(MAX_LENGTH_SERVICE);
@@ -70,7 +72,7 @@ namespace Services.DataHandler
             return newCustomService;
         }
 
-       
+
 
 
     }
