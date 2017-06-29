@@ -13,30 +13,39 @@ namespace Services.DataHandler
 
         public List<Service> GetAllServices()
         {
-            return Global.Services;
+            List<Service> list = new List<Service>();
+            DBService dbService = new DBService();
+            list = dbService.GetAllServices();
+            dbService.Dispose();
+            return list;
         }
 
         public void AddServiceToList(Service newService)
         {
-            Global.Services.Add(newService);
+            DBService dbService = new DBService();
+            dbService.CreateService(newService);
+            dbService.Dispose();
         }
 
         public List<Service> GetListSortedBy(SortType myEnum)
         {
             List<Service> list = new List<Service>();
+            DBService dbService = new DBService();
+            list = dbService.GetAllServices();
+
             switch (myEnum)
             {
                 case SortType.Name:
-                    list = Global.Services.OrderBy(x => x.Name).ToList();
-                    break;
+                    return list.OrderBy(x => x.ServiceName).ToList();
                 case SortType.Type:
-                    list = Global.Services.OrderByDescending(x => x.ServiceType).ToList();
-                    break;
+                    return list.OrderByDescending(x => x.ServiceType).ToList();
             }
-            return list;
+            return new List<Service>();
         }
 
         List<Service> _services = new List<Service>();
+
+
         public List<Service> DownloadServices()
         {
             switch (Global.InputDataType)
@@ -53,21 +62,16 @@ namespace Services.DataHandler
             return _services;
         }
 
-        public Service CreateService()
+
+        public Service CreateServiceFromConsole()
         {
             Service newCustomService = new Service();
-            OutputService.Display("Enter Service Name: ");
-            newCustomService.Name = StringValidation.ValidateLength(MAX_LENGTH_SERVICE);
+            OutputService.DisplayConsole("Enter Service Name: ");
+            newCustomService.ServiceName = StringValidation.ValidateLength(MAX_LENGTH_SERVICE);
 
-            OutputService.Display("Enter Service Type (choose number): ");
-
+            OutputService.DisplayConsole("Enter Service Type (choose number): "); 
             newCustomService.ServiceType = (ServiceType)InputService.GetValidatedUserChoice(new ServiceType());
-
-            OutputService.Display("Enter Phone Number: ");
-            newCustomService.PhoneNumber = StringValidation.ValidatePhone();
-
-            OutputService.Display("Enter Responsible Person Name: ");
-            newCustomService.Responsible = StringValidation.ValidateLength(MAX_LENGTH_RESPONSIBLE); ;
+            newCustomService.PersonId = PersonHandler.GetPersonId(); 
 
             return newCustomService;
         }

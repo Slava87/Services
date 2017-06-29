@@ -23,7 +23,7 @@ namespace Services.IOServices
             }
             catch (Exception ex)
             {
-                OutputService.Display("Error: " + ex.Message);
+                OutputService.DisplayConsole("Error: " + ex.Message);
                 InputService.ReadDataFromConsole();
             }
             return items;

@@ -8,9 +8,11 @@ namespace Services.IOServices
 {
     public class InputService
     {
-        public Action[] Actions = { Show, Sort, AddService, Export, Exit };
+        //public Action[] Actions = { Show, Sort, AddService, Load, Export, Exit };
 
-        public void GetDataSource()
+
+
+        public static void GetDataSource()
         {
             Global.InputDataSource = (DataSource)GetValidatedUserChoice(new DataSource());
 
@@ -19,25 +21,16 @@ namespace Services.IOServices
             {
                 case DataSource.DefaultLocation:
                     Global.InputPath = @"..\..\Data\services.xml";
-                    serviceHdlr = new ServiceHandler();
-                    Global.Services.AddRange(serviceHdlr.DownloadServices());
                     break;
                 case DataSource.ChooseManually:
                     GetInputPath();
-                    serviceHdlr = new ServiceHandler();
-                    Global.Services.AddRange(serviceHdlr.DownloadServices());
-                    break;
-                case DataSource.Database:
-                    DBService dbService = new DBService();
-                    Global.Services.AddRange(dbService.GetAllServices());
-                    dbService.Dispose();
                     break;
             }
         }
 
-        private void GetInputPath()
+        private static void GetInputPath()
         {
-            OutputService.Display(@"Please enter file location (example c:\myFile.txt):");
+            OutputService.DisplayConsole(@"Please enter file location (example c:\myFile.txt):");
             while (true)
             {
                 string path = ReadDataFromConsole();
@@ -47,33 +40,33 @@ namespace Services.IOServices
                     break;
                 }
                 else
-                    OutputService.Display(@"Your path is not correct");
+                    OutputService.DisplayConsole(@"Your path is not correct");
             }
         }
 
-        public void GetDataType()
+        public static void GetDataType()
         {
             Global.InputDataType = (DataType)GetValidatedUserChoice(new DataType());
         }
 
-        public void GetSortType()
+        public static void GetSortType()
         {
             Global.SortType = (SortType)GetValidatedUserChoice(new SortType());
         }
 
-        public void GetCommand()
+        public static Commands GetCommand()
         {
-            Global.Command = (Commands)GetValidatedUserChoice(new Commands());
+            return (Commands)GetValidatedUserChoice(new Commands());
         }
 
         public static int GetValidatedUserChoice(Enum inputEnum)
         {
-            OutputService.Display("Choose option: ");
+            OutputService.DisplayConsole("Choose option: ");
 
             int i = 0;
             foreach (var item in Enum.GetValues(inputEnum.GetType()))
             {
-                OutputService.Display("   " + i + " - " + item);
+                OutputService.DisplayConsole("   " + i + " - " + item);
                 i++;
             }
 
@@ -85,7 +78,7 @@ namespace Services.IOServices
                 parseResult = Int32.TryParse(input, out index);
                 if (index < 0 || index >= i || !parseResult)
 
-                    OutputService.Display("Error, please enter correct number");
+                    OutputService.DisplayConsole("Error, please enter correct number");
             }
 
             return index;
@@ -98,88 +91,166 @@ namespace Services.IOServices
 
         public void Run()
         {
-            GetDataSource();
-
-            if (Global.InputDataSource != DataSource.Database)
-                GetDataType();
-
             while (true)
             {
                 Console.Clear();
-                OutputService.Display("");
-                OutputService.Display("Please enter command:");
-                GetCommand();
-                Actions[(int)Global.Command]();
+                OutputService.DisplayConsole("");
+                OutputService.DisplayConsole("Please enter command:");
+                Commands command = GetCommand();
+                //Actions[(int)Global.Command]();
+                switch (command)
+                {
+                    case Commands.Show:
+                        Show();
+                        break;
+                    case Commands.Sort:
+                        Sort();
+                        break;
+                    case Commands.Add:
+                        AddService();
+                        break;
+                    case Commands.Load:
+                        Load();
+                        break;
+                    case Commands.Export:
+                        Export();
+                        break;
+                    case Commands.Exit:
+                        Exit();
+                        break;
+                    case Commands.Edit:
+                        Edit();
+                        break;
+                    case Commands.Delete:
+                        Delete();
+                        break;
+                }
                 ReadDataFromConsole();
             }
         }
 
+
+
         #region Actions
 
-        private static void Exit()
+        private void Delete()
+        {
+            OutputService.DisplayConsole("Enter Id of Service:");
+            string choice = ReadDataFromConsole();
+            int i = StringValidation.ValidatePositiveInt(choice);
+            DBService dbService = new DBService();
+            if (i > 0 && dbService.ServiceExist(i))
+            {
+               
+                dbService.RemoveService(i);
+            }
+            else
+            {
+                OutputService.DisplayConsole("Id is not valid");
+            }
+            dbService.Dispose();
+        }
+
+        private void Edit()
+        {
+            OutputService.DisplayConsole("Enter Id of Service:");
+            string choice = ReadDataFromConsole();
+            int i = StringValidation.ValidatePositiveInt(choice);
+            DBService dbService = new DBService();
+            if (i > 0 && dbService.ServiceExist(i))
+            {
+                OutputService.DisplayConsole("Your service to edit:");
+                OutputService.DisplayConsole(dbService.GetService(i));
+                ServiceHandler serviceHandler = new ServiceHandler();
+                Service newService = serviceHandler.CreateServiceFromConsole();
+                newService.Id = i;
+
+                dbService.Update(newService);
+            }
+            else
+            {
+                OutputService.DisplayConsole("Id is not valid");
+            }
+            dbService.Dispose();
+        }
+
+        private void Exit()
         {
             Environment.Exit(0);
         }
 
-        private static void Sort()
+        private void Load()
+        {
+            GetDataSource();
+            GetDataType();
+            List<Service> tempServices = new List<Service>();
+
+            ServiceHandler sh = new ServiceHandler();
+            tempServices = sh.DownloadServices();
+
+            DBService dbService = new DBService();
+            dbService.Create(tempServices);
+            dbService.Dispose();
+        }
+
+        private void Sort()
         {
             SortType sortType = (SortType)GetValidatedUserChoice(new SortType());
             ServiceHandler sH = new ServiceHandler();
             List<Service> list = sH.GetListSortedBy(sortType);
-            OutputService.WriteConsole(list);
-            OutputService.Display("");
+            OutputService.DisplayConsole(list);
+            OutputService.DisplayConsole("");
         }
 
-        private static void Show()
+        private void Show()
         {
-            OutputService.WriteConsole(Global.Services);
+            DBService dbService = new DBService();
+            OutputService.DisplayConsole(dbService.GetAllServices());
+            dbService.Dispose();
         }
 
-        private static void Export()
+        private void Export()
         {
             Global.OutputDataSource = (DataSource)GetValidatedUserChoice(new DataSource());
 
-            if (Global.OutputDataSource != DataSource.Database)
+            if (Global.OutputDataSource != DataSource.DefaultLocation)
+            {
                 Global.OutputDataType = (DataType)GetValidatedUserChoice(new DataType());
 
-
-            if (Global.OutputDataSource == DataSource.ChooseManually ||
-                Global.OutputDataSource == DataSource.DefaultLocation)
-            {
-
-                OutputService.Display(@"Please enter file location (example c:\myFile.txt):");
+                OutputService.DisplayConsole(@"Please enter file location (example c:\myFile.txt):");
                 while (true)
                 {
-                    string path = ReadDataFromConsole();
-                    Global.OutputPath = path;
+                    Global.OutputPath = ReadDataFromConsole();
                     break;
                 }
-
-
-                switch (Global.OutputDataType)
-                {
-                    case DataType.JSON:
-                        JsonService jsonWriteService = new JsonService();
-                        jsonWriteService.WriteServiceToJsonFile(Global.Services);
-                        break;
-                    case DataType.XML:
-                        XmlService xmlWriteService = new XmlService();
-                        xmlWriteService.WriteServicesToXmlFile(Global.Services);
-                        break;
-                }
             }
-            if (Global.OutputDataSource == DataSource.Database)
+            else
             {
-                DBService dbService = new DBService();
-                dbService.Save(Global.Services);
-                dbService.Dispose();
+                Global.OutputPath = @"..\..\Data\services.xml";
+            }
+
+
+            DBService dbService = new DBService();
+            List<Service> services = dbService.GetAllServices();
+            dbService.Dispose();
+
+            switch (Global.OutputDataType)
+            {
+                case DataType.JSON:
+                    JsonService jsonWriteService = new JsonService();
+                    jsonWriteService.WriteServiceToJsonFile(services);
+                    break;
+                case DataType.XML:
+                    XmlService xmlWriteService = new XmlService();
+                    xmlWriteService.WriteServicesToXmlFile();
+                    break;
             }
         }
 
-        private static void AddService()
+        private void AddService()
         {
             ServiceHandler serviceHandler = new ServiceHandler();
-            Service newService = serviceHandler.CreateService();
+            Service newService = serviceHandler.CreateServiceFromConsole();
             serviceHandler.AddServiceToList(newService);
         }
 

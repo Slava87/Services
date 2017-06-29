@@ -15,14 +15,14 @@ namespace Services.DataHandler
                     return str;
                 else if (string.IsNullOrEmpty(str))
                 {
-                    OutputService.Display("Line can not be empty");
-                    OutputService.Display("Please try again");
+                    OutputService.DisplayConsole("Line can not be empty");
+                    OutputService.DisplayConsole("Please try again");
                     str = InputService.ReadDataFromConsole();
                 }
                 else
                 {
-                    OutputService.Display($"Line is too long. Max is {length} symbols");
-                    OutputService.Display("Please try again");
+                    OutputService.DisplayConsole($"Line is too long. Max is {length} symbols");
+                    OutputService.DisplayConsole("Please try again");
                     str = InputService.ReadDataFromConsole();
                 }
             }
@@ -38,11 +38,23 @@ namespace Services.DataHandler
                     return str;
                 else
                 {
-                    OutputService.Display("PhoneNumber is not correct");
-                    OutputService.Display("Please try again");
+                    OutputService.DisplayConsole("PhoneNumber is not correct");
+                    OutputService.DisplayConsole("Please try again");
                     str = InputService.ReadDataFromConsole();
                 }
             }
         }
+
+        public static int ValidatePositiveInt(string data)
+        {
+            while (true)
+            {
+                int i = -1;
+                Int32.TryParse(data, out i);      
+                return i;
+            }
+
+        }
+
     }
 }

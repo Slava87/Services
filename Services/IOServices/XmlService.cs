@@ -13,23 +13,6 @@ namespace Services.IOServices
 {
     public class XmlService
     {
-        public void WriteServicesToXmlFile(List<Service> servicesList)
-        {
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Service>));
-
-            string xml = "";
-
-            using (StringWriter sw = new StringWriter())
-            {
-                using (XmlWriter writer = XmlWriter.Create(sw))
-                {
-                    xmlSerializer.Serialize(writer, servicesList);
-                    xml = sw.ToString();
-                    File.WriteAllText(Global.OutputPath, xml, Encoding.UTF8); 
-                }
-            }
-        }
-
         public List<Service> ReadXmlFromFile()
         {
             string path = Global.InputPath;
@@ -48,10 +31,36 @@ namespace Services.IOServices
             }
             catch (Exception ex)
             {
-                OutputService.Display("Error: " + ex.InnerException);
+                OutputService.DisplayConsole("Error: " + ex.InnerException);
                 InputService.ReadDataFromConsole();
             }
             return services;
+        }
+
+        public void WriteServicesToXmlFile()
+        {
+            DBService dbService = new DBService();
+            Serialization serialization = new Serialization
+            {
+                Services = dbService.GetAllServices(),
+                Persons = dbService.GetAllPersons()
+            };
+            dbService.Dispose();
+
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Service>));
+            List<Service> test = new List<Service>();
+
+            string xml = "";
+
+            using (StringWriter sw = new StringWriter())
+            {
+                using (XmlWriter writer = XmlWriter.Create(sw))
+                {
+                    xmlSerializer.Serialize(writer, test);
+                    xml = sw.ToString();
+                    File.WriteAllText(Global.OutputPath, xml, Encoding.UTF8);
+                }
+            }
         }
     }
 }

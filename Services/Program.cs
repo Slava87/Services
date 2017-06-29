@@ -13,7 +13,7 @@ namespace Services
        public static void Main(string[] args)
         {
             InputService consoleInputService = new InputService(); 
-            consoleInputService.Run();  
+            consoleInputService.Run(); 
         }                    
     }
 }

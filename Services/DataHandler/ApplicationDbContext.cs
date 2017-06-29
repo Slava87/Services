@@ -12,6 +12,6 @@ namespace Services.DataHandler
         }
 
         public DbSet<Service> Services { get; set; }
-    }
-    
+        public DbSet<Person> Persons { get; set; }
+    } 
 }

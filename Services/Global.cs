@@ -3,6 +3,12 @@ using Services.Entity;
 
 namespace Services.DataHandler
 {
+    public enum NoYes
+    {
+        No,
+        Yes
+    }
+
     public enum SortType
     {
         Name,
@@ -14,6 +20,9 @@ namespace Services.DataHandler
         Show,
         Sort,
         Add,
+        Edit,
+        Delete,
+        Load,
         Export,
         Exit
     }
@@ -27,8 +36,7 @@ namespace Services.DataHandler
     public enum DataSource
     {
         DefaultLocation,
-        ChooseManually,
-        Database
+        ChooseManually, 
     }
 
     public enum ServiceType
